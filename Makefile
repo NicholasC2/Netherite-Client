@@ -11,8 +11,12 @@ BUILD_DIR = build
 SRC = $(SRC_DIR)/main.cpp
 
 # Includes and Libraries
-INCLUDES = -IInclude
-LIBS = -LLib
+INCLUDES = -I"include"
+LIBS = -L"lib" -lSDL3
+
+# Optional Vulkan
+VULKAN_DIR = C:/VulkanSDK
+VULKAN_LIB = -L$(VULKAN_DIR)/Lib
 
 # Compiler flags
 CXXFLAGS = -std=c++17 -Wall -g $(INCLUDES)
@@ -22,19 +26,20 @@ ifeq ($(OS),Windows_NT)
 	EXE = $(BUILD_DIR)/main.exe
 	MKDIR = if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
 	DEL = del /f /q
-	RUN = $(EXE)
+	RUN = main.exe
 	CXXFLAGS += -mwindows
 else
 	EXE = $(BUILD_DIR)/main
 	MKDIR = mkdir -p $(BUILD_DIR)
 	DEL = rm -f
-	RUN = ./$(EXE)
+	RUN = ./main
 endif
 
 # Build target
 $(EXE): $(SRC)
 	$(MKDIR)
-	$(CXX) $(CXXFLAGS) -o $(EXE) $(SRC) $(LIBS)
+	windres src/resource.rc -o src/resource.o
+	$(CXX) $(CXXFLAGS) -o $(EXE) $(SRC) $(LIBS) $(VULKAN_LIB) src/resource.o
 
 # Clean target
 clean:
@@ -42,4 +47,4 @@ clean:
 
 # Run target
 run: $(EXE)
-	$(RUN)
+	cd build && $(RUN)
