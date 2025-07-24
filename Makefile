@@ -38,8 +38,7 @@ endif
 # Build target
 $(EXE): $(SRC)
 	$(MKDIR)
-	windres src/resource.rc -o src/resource.o
-	$(CXX) $(CXXFLAGS) -o $(EXE) $(SRC) $(LIBS) $(VULKAN_LIB) src/resource.o
+	$(CXX) $(CXXFLAGS) -o $(EXE) $(SRC) $(LIBS) $(VULKAN_LIB) 
 
 # Clean target
 clean:
@@ -48,3 +47,7 @@ clean:
 # Run target
 run: $(EXE)
 	cd build && $(RUN)
+
+# Compile Resources
+icon:
+	windres src/resource.rc -o src/resource.o
