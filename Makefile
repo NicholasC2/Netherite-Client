@@ -12,11 +12,7 @@ SRC = $(SRC_DIR)/main.cpp
 
 # Includes and Libraries
 INCLUDES = -I"include"
-LIBS = -L"lib" -lSDL3
-
-# Optional Vulkan
-VULKAN_DIR = C:/VulkanSDK
-VULKAN_LIB = -L$(VULKAN_DIR)/Lib
+LIBS = -L"lib" -lSDL3 -lvulkan-1
 
 # Compiler flags
 CXXFLAGS = -std=c++17 -Wall -g $(INCLUDES)
@@ -27,18 +23,20 @@ ifeq ($(OS),Windows_NT)
 	MKDIR = if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
 	DEL = del /f /q
 	RUN = main.exe
-	CXXFLAGS += -mwindows
+	CXXFLAGS += -mwindows -Wl,--enable-stdcall-fixup
+	COPY = copy lib\SDL3.dll build
 else
 	EXE = $(BUILD_DIR)/main
 	MKDIR = mkdir -p $(BUILD_DIR)
 	DEL = rm -f
 	RUN = ./main
+	COPY = cp ./lib/SDL3.dll ./build/
 endif
 
 # Build target
 $(EXE): $(SRC)
 	$(MKDIR)
-	$(CXX) $(CXXFLAGS) -o $(EXE) $(SRC) $(LIBS) $(VULKAN_LIB) 
+	$(CXX) $(CXXFLAGS) -o $(EXE) $(SRC) $(LIBS)
 
 # Clean target
 clean:
@@ -46,6 +44,7 @@ clean:
 
 # Run target
 run: $(EXE)
+	$(COPY)
 	cd build && $(RUN)
 
 # Compile Resources
