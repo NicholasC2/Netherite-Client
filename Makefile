@@ -17,13 +17,15 @@ LIBS = -L"lib" -lSDL3 -lvulkan-1
 # Compiler flags
 CXXFLAGS = -std=c++17 -Wall -g $(INCLUDES)
 
+FINAL_BUILD_CXXFLAGS = -mwindows
+
 # OS detection
 ifeq ($(OS),Windows_NT)
 	EXE = $(BUILD_DIR)/main.exe
 	MKDIR = if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
 	DEL = del /f /q
 	RUN = main.exe
-	CXXFLAGS += -mwindows -Wl,--enable-stdcall-fixup
+	CXXFLAGS += -Wl,--enable-stdcall-fixup
 	COPY = copy lib\SDL3.dll build
 else
 	EXE = $(BUILD_DIR)/main
@@ -36,7 +38,8 @@ endif
 # Build target
 $(EXE): $(SRC)
 	$(MKDIR)
-	$(CXX) $(CXXFLAGS) -o $(EXE) $(SRC) $(LIBS)
+	windres src/resource.rc -o src/resource.o
+	$(CXX) $(FINAL_BUILD_CXXFLAGS) $(CXXFLAGS) -o $(EXE) $(SRC) $(LIBS) src/resource.o
 
 # Clean target
 clean:
@@ -46,7 +49,3 @@ clean:
 run: $(EXE)
 	$(COPY)
 	cd build && $(RUN)
-
-# Compile Resources
-icon:
-	windres src/resource.rc -o src/resource.o
